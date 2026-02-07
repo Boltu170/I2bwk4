@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Financial Analysis - Interactive Slides</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Source Sans Pro', sans-serif; background: linear-gradient(135deg, #1a0033 0%, #2d1b4e 50%, #1a0033 100%); color: #fff; overflow-x: hidden; }
+        .slide { display: none; min-height: 100vh; padding: 50px 70px; animation: fadeIn 0.5s; }
+        .slide.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { font-family: 'Merriweather', serif; font-size: 2.5em; font-weight: 900; margin-bottom: 40px; color: #ffd700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); border-bottom: 3px solid #ffd700; padding-bottom: 15px; }
+        .box { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border-radius: 12px; padding: 28px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .box-title { font-family: 'Merriweather', serif; font-size: 1.4em; color: #ffd700; margin-bottom: 12px; font-weight: 700; }
+        .box-content { font-size: 1.1em; line-height: 1.7; color: #e8e8e8; }
+        .box-content ul { margin-left: 22px; margin-top: 8px; }
+        .box-content li { margin-bottom: 8px; }
+        .example { background: rgba(255,215,0,0.15); border-left: 4px solid #ffd700; padding: 18px; margin-top: 12px; border-radius: 8px; }
+        .question-box { background: rgba(100,50,150,0.3); border-radius: 12px; padding: 25px; margin-top: 25px; }
+        .question-text { font-size: 1.2em; font-weight: 600; margin-bottom: 18px; color: #ffd700; }
+        .option { background: rgba(255,255,255,0.1); padding: 13px 18px; margin: 8px 0; border-radius: 8px; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; }
+        .option:hover { background: rgba(255,255,255,0.2); border-color: #ffd700; transform: translateX(8px); }
+        .show-btn { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a0033; border: none; padding: 13px 32px; font-size: 1.05em; font-weight: 600; border-radius: 25px; cursor: pointer; transition: all 0.3s; margin-top: 15px; box-shadow: 0 4px 15px rgba(255,215,0,0.4); }
+        .show-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,215,0,0.6); }
+        .answer { display: none; background: rgba(0,255,136,0.15); border-left: 4px solid #00ff88; padding: 18px; margin-top: 18px; border-radius: 8px; animation: slideDown 0.4s; }
+        .answer.visible { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .answer-label { font-weight: 700; color: #00ff88; font-size: 1.15em; margin-bottom: 8px; }
+        .nav { position: fixed; bottom: 35px; right: 35px; display: flex; gap: 12px; z-index: 1000; }
+        .nav-btn { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 2px solid #ffd700; color: #ffd700; padding: 13px 28px; font-size: 1.05em; font-weight: 600; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .nav-btn:hover:not(:disabled) { background: #ffd700; color: #1a0033; transform: scale(1.05); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .counter { position: fixed; top: 25px; right: 35px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 10px 22px; border-radius: 20px; font-weight: 600; color: #ffd700; border: 2px solid rgba(255,215,0,0.3); }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: rgba(255,255,255,0.05); }
+        th, td { padding: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.2); }
+        th { background: rgba(255,215,0,0.2); color: #ffd700; font-weight: 600; }
+        .formula { background: rgba(0,0,0,0.3); padding: 18px; border-radius: 10px; font-family: monospace; font-size: 1.15em; text-align: center; margin: 15px 0; border: 2px solid #ffd700; }
+        .highlight { color: #00ff88; font-weight: 600; }
+        .calc-step { background: rgba(0,0,0,0.2); padding: 13px; margin: 8px 0; border-radius: 8px; border-left: 3px solid #ffd700; }
+        @media (max-width: 768px) { .slide { padding: 35px 25px; } h1 { font-size: 2em; } .nav { bottom: 20px; right: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="counter"><span id="current">1</span> / <span id="total">15</span></div>
+
+```
+<div class="slide" data-slide="1">
+    <h1>Financial Objectives</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Financial objectives are specific, measurable financial goals that a business aims to achieve within a defined timeframe. These objectives outline what the business wishes to accomplish financially, whether it's increasing profit, improving cash flow, or reducing costs. Constraints are internal and external factors that affect the firm's ability to achieve these objectives.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Think of financial objectives as your business's financial 'New Year's resolutions.' Just like you might say 'I want to save £5,000 by December,' a business says 'We want to increase profit by 15% by the end of Q4.' These goals are specific, measurable, and time-bound, giving the business a clear target to work toward.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Thornton's Chocolate (2012-2013):</strong> The company set a financial objective 'to boost operating margins to match the industry average within three years.' This was a specific, measurable goal.<div class='example'><strong>Result:</strong> By 2013, Thornton's successfully increased their operating margins from 1.3% to 3.3%, demonstrating how clear financial objectives can drive business improvement and strategic decision-making.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: Which of the following is NOT a characteristic of a well-defined financial objective?</div>
+```
+
+<div class="options"><div class="option">A) Contains a specific numerical target</div><div class="option">B) Includes a clear timeframe for achievement</div><div class="option">C) Uses vague language like 'improve' without specifics</div><div class="option">D) Set by managers responsible for business finance</div></div>
+            <button class="show-btn" onclick="toggleAnswer(1)">Show Answer</button>
+            <div class="answer" id="answer1">
+                <div class="answer-label">✓ Correct Answer: C</div>
+                <div class="box-content"><strong>Explanation:</strong> Well-defined financial objectives must be SMART (Specific, Measurable, Achievable, Relevant, Time-bound). Option C describes a vague objective without specifics, which makes it poorly defined. For example, saying 'improve profit' is vague, whereas 'increase profit by 15% within 12 months' is specific and measurable. Options A, B, and D are all characteristics of properly structured financial objectives.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="2">
+    <h1>Types of Financial Objectives</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Businesses can pursue various types of financial objectives depending on their strategic priorities: <strong>Profit maximization</strong> (increasing overall profitability), <strong>Return on Investment (ROI)</strong> (maximizing returns relative to investment), <strong>Financial safety</strong> (maintaining adequate cash reserves and liquidity), <strong>Capital structure objectives</strong> (optimizing debt-to-equity balance), <strong>Capital spending objectives</strong> (strategic allocation of investment funds), and <strong>Cost minimization</strong> (reducing expenses to improve efficiency).</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Just as you might have different financial priorities throughout your life (saving for a house, paying off debt, building an emergency fund), businesses also have different financial focuses depending on their situation. A startup might focus on cash flow survival, while an established company might focus on maximizing returns for shareholders. Each objective serves a different strategic purpose.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>ASOS plc (2014):</strong> The online fashion retailer set a financial objective 'to achieve £1 billion annual sales turnover.'<div class='example'><strong>Context:</strong> In the 2014 financial year, sales reached over £955 million, putting them within striking distance of their target. This revenue-focused objective helped ASOS prioritize growth and market expansion over short-term profitability, a common strategy for fast-growing digital businesses seeking to dominate their market sector.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A small tech startup is running low on cash despite strong sales growth. Which financial objective should they prioritize?</div>
+```
+
+<div class="options"><div class="option">A) Profit maximization</div><div class="option">B) Financial safety (cash flow management)</div><div class="option">C) Capital spending objectives</div><div class="option">D) Return on investment</div></div>
+            <button class="show-btn" onclick="toggleAnswer(2)">Show Answer</button>
+            <div class="answer" id="answer2">
+                <div class="answer-label">✓ Correct Answer: B</div>
+                <div class="box-content"><strong>Explanation:</strong> Financial safety through cash flow management should be the priority. Fast-growing companies often face a 'growth paradox' where increasing sales require upfront investment in inventory, staff, and operations before revenue is collected. This creates cash flow gaps that can threaten the business's survival, even when sales are strong. Many profitable businesses have failed due to poor cash flow management. The startup needs to ensure sufficient liquidity to meet immediate obligations before pursuing other objectives.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="3">
+    <h1>Cost Cutting Strategies</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Cost cutting strategies are systematic approaches to reduce expenses and improve efficiency. <strong>Fixed Cost Reduction:</strong> Close loss-making branches/factories, relocate to lower-cost locations, remove management layers. <strong>Variable Cost Reduction:</strong> Renegotiate with existing suppliers, source from lower-cost countries, redesign products for simpler production.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Imagine your household budget: your rent is a fixed cost (stays the same monthly), while groceries are variable (change based on what you buy). To save money, you could move to a cheaper apartment (cut fixed costs) or buy generic brands and shop at discount stores (cut variable costs). Businesses do the same thing, but on a larger scale—they identify which expenses are unchanging versus which fluctuate with production.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Dell Computers (2000s):</strong> Dell revolutionized the PC industry by implementing aggressive cost-cutting strategies.<div class='example'><strong>Variable Cost Strategy:</strong> Dell sourced components from low-cost suppliers in Asia and used 'just-in-time' manufacturing, eliminating warehouse costs. They also cut out retail middlemen by selling directly online.<br><br><strong>Fixed Cost Strategy:</strong> Instead of expensive retail stores, Dell operated lean manufacturing facilities in strategic locations.<br><br><strong>Result:</strong> These strategies enabled Dell to offer computers at prices 10-15% lower than competitors while maintaining healthy profit margins, making them the world's largest PC manufacturer by 2001.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A restaurant chain pays £50,000/month in rent for 5 locations, £30,000 in management salaries, and £2 per meal in ingredient costs. They're considering closing 2 underperforming locations. What type of cost reduction is this?</div>
+```
+
+<div class="options"><div class="option">A) Variable cost reduction</div><div class="option">B) Fixed cost reduction</div><div class="option">C) Mixed cost reduction</div><div class="option">D) Marginal cost reduction</div></div>
+            <button class="show-btn" onclick="toggleAnswer(3)">Show Answer</button>
+            <div class="answer" id="answer3">
+                <div class="answer-label">✓ Correct Answer: B</div>
+                <div class="box-content"><strong>Explanation:</strong> This is fixed cost reduction. Closing locations primarily reduces fixed costs like rent and associated management salaries, which must be paid regardless of how many meals are served. The rent expense doesn't change based on customer volume—it's a fixed monthly obligation. While closing locations will also reduce some variable costs (fewer ingredients purchased), the strategic decision to close branches is fundamentally about eliminating fixed cost burdens.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="4">
+    <h1>Understanding Revenue, Costs & Profit</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content"><strong>Revenue:</strong> The total value of all sales made by a business within a specific period (also called 'turnover' or 'sales').<br><strong>Costs:</strong> All expenses incurred in producing and selling products, including wages, raw materials, rent, utilities, and other operational expenses.<br><strong>Profit:</strong> The financial gain achieved when total sales revenue exceeds total costs.<div class='formula'>Profit = Revenue - Total Costs</div></div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Think of running a lemonade stand: <strong>Revenue</strong> is all the money you collect from selling lemonade. <strong>Costs</strong> are what you spent on lemons, sugar, cups, and the table rental. <strong>Profit</strong> is what's left in your pocket after paying all those expenses. If you sold £100 worth of lemonade but spent £60 on supplies, your profit is £40. Simple as that!</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Apple Inc. (Q4 2024):</strong><div class='example'><strong>Revenue:</strong> Apple generated approximately $94.9 billion in total sales from iPhones, Macs, services, and other products.<br><br><strong>Costs:</strong> This included manufacturing costs (~$52 billion), operating expenses including R&D and marketing (~$14 billion), and other costs.<br><br><strong>Profit:</strong> After deducting all costs, Apple's net profit was approximately $22.5 billion for the quarter.<br><br><strong>Why profit matters:</strong> This profit funds future product development (like Vision Pro), shareholder dividends, and business expansion—demonstrating why profit is essential for business growth and sustainability.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A bakery has monthly figures: Sales revenue £45,000, ingredient costs £12,000, staff wages £18,000, rent & utilities £8,000. Calculate the monthly profit.</div>
+
+        <button class="show-btn" onclick="toggleAnswer(4)">Show Answer</button>
+        <div class="answer" id="answer4">
+            <div class="answer-label">✓ Correct Answer: £7,000 profit</div>
+            <div class="box-content"><div class='calc-step'><strong>Step 1:</strong> Calculate total costs<br>Total Costs = Ingredients + Wages + Rent & Utilities<br>Total Costs = £12,000 + £18,000 + £8,000 = £38,000</div><div class='calc-step'><strong>Step 2:</strong> Calculate profit<br>Profit = Revenue - Total Costs<br>Profit = £45,000 - £38,000 = <span class='highlight'>£7,000</span></div><strong>Interpretation:</strong> The bakery generates £7,000 in monthly profit. This represents a profit margin of 15.6% (£7,000 ÷ £45,000), which is healthy for the food service industry.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="5">
+    <h1>Why Profit Matters</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Profit serves three critical functions: <strong>1. Measure of Success:</strong> Provides a clear, quantifiable indicator of business performance. <strong>2. Source of Investment Capital:</strong> Retained profits are the most cost-effective source of funding for growth, expansion, and development—without incurring debt or diluting ownership. <strong>3. Investor Attraction:</strong> Consistent profitability attracts external investors and lenders, enticed by the prospect of strong returns.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Imagine profit as the fuel in your car's tank. Without fuel, you can't go anywhere. <strong>First,</strong> the fuel gauge tells you if your car is running well (measure of success). <strong>Second,</strong> having a full tank means you can take longer trips without stopping (funding growth). <strong>Third,</strong> if you're known for always having a full tank and reliable car, friends are more likely to lend you money for upgrades because they trust you'll pay them back (investor attraction).</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Amazon (1994-2015):</strong> A fascinating case study in profit strategy.<div class='example'><strong>The Strategy:</strong> For over two decades, Amazon deliberately operated at low or zero profit, reinvesting virtually all revenue back into the business—building warehouses, developing technology, and undercutting competitors.<br><br><strong>Investor Attraction Despite Low Profit:</strong> Despite minimal profits, Amazon's stock price soared because investors believed in Jeff Bezos's vision. The company's growing revenue and market dominance signaled future profitability.<br><br><strong>The Payoff:</strong> By 2015, Amazon began showing substantial profits. In 2023, net profit exceeded $30 billion. Early investors who bet on Amazon despite low profits saw extraordinary returns—a $1,000 investment in 1997 would be worth over $2 million today.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: Why might a rapidly growing technology startup intentionally choose to operate at a loss for several years?</div>
+
+        <button class="show-btn" onclick="toggleAnswer(5)">Show Answer</button>
+        <div class="answer" id="answer5">
+            <div class="answer-label">✓ Answer: Strategic Growth Investment</div>
+            <div class="box-content"><strong>Key Reasons:</strong><br><br><strong>1. Market Share Acquisition:</strong> Tech startups often prioritize capturing market share over immediate profitability. They may price products below cost to attract users and eliminate competitors (e.g., Uber, Spotify).<br><br><strong>2. Network Effects:</strong> Many tech platforms become more valuable as they gain users. Operating at a loss initially can build a critical mass that creates sustainable competitive advantage.<br><br><strong>3. Infrastructure Investment:</strong> Significant upfront investment in technology, R&D, and infrastructure may be necessary before operating efficiently at scale.<br><br><strong>Example:</strong> Netflix operated at a loss or marginal profit for years while investing billions in content and technology. This strategy helped them dominate streaming, and they're now highly profitable with over 260 million subscribers.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="6">
+    <h1>Calculating Business Revenue</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Revenue is the total income generated from selling goods or services before any costs are deducted. It represents the top line of business financial performance.<div class='formula'>Revenue = Volume of Units Sold × Average Selling Price</div>This formula is fundamental to financial planning. Entrepreneurs must forecast revenue accurately to determine business model viability. Revenue alone doesn't indicate profitability—a business can have high revenue but still lose money if costs are too high.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Revenue is simply: <strong>How many things did you sell?</strong> multiplied by <strong>How much did you charge for each one?</strong> If you sold 100 cupcakes at £3 each, your revenue is £300. That's the total money coming in before you worry about what you spent on flour, eggs, and rent. It's the starting point for understanding your business's financial health.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Dynamic Pricing: EasyJet Airlines (2014):</strong><div class='example'>Modern businesses use sophisticated revenue management strategies. EasyJet exemplifies this with dynamic pricing:<br><br><strong>Same flight (Sunday 11:40 AM to Barcelona) priced differently:</strong><br>• December 28: £98.99 (peak holiday season)<br>• January 25: £41.99 (off-peak period)<br>• March 1: £65.99 (moderate demand)<br><br><strong>Revenue Strategy:</strong> By adjusting prices based on demand, EasyJet maximizes revenue. A £98.99 ticket on a full December flight generates more revenue than a £41.99 January ticket, but the January flight might otherwise have empty seats earning £0.<br><br><strong>Result:</strong> If a December flight has 180 seats @ £98.99 average = £17,818 revenue, while January might have 180 seats @ £41.99 average = £7,558 revenue. Different revenue from identical aircraft and route—the power of pricing strategy.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A coffee shop sells 150 lattes at £3.50 each, 200 cappuccinos at £3.20 each, and 80 pastries at £2.50 each. Calculate total daily revenue.</div>
+
+        <button class="show-btn" onclick="toggleAnswer(6)">Show Answer</button>
+        <div class="answer" id="answer6">
+            <div class="answer-label">✓ Correct Answer: £1,365</div>
+            <div class="box-content"><div class='calc-step'><strong>Latte Revenue:</strong> 150 × £3.50 = £525</div><div class='calc-step'><strong>Cappuccino Revenue:</strong> 200 × £3.20 = £640</div><div class='calc-step'><strong>Pastry Revenue:</strong> 80 × £2.50 = £200</div><div class='calc-step'><strong>Total Revenue:</strong> £525 + £640 + £200 = <span class='highlight'>£1,365</span></div><strong>Key Insight:</strong> Cappuccinos contribute the most to revenue (£640) even though lattes have a higher price, because volume matters just as much as price. If this is a typical day and the shop operates 300 days per year, annual revenue would be approximately £409,500.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="7">
+    <h1>Fixed Costs</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content"><strong>Fixed costs</strong> are expenses that do not vary with the level of production or sales volume. These costs are linked to time rather than business activity and must be paid regardless of whether the business produces 0 units or 10,000 units.<br><br><strong>Common examples:</strong> Rent (monthly lease payments), Insurance (annual/monthly premiums), Salaries (fixed management and administrative), Equipment/Plant (depreciation or lease payments), Design costs (one-time product development), Advertising (pre-committed marketing campaigns).<br><br>Fixed costs create financial pressure during low-sales periods because they must be paid even when revenue is minimal.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Think of fixed costs like your Netflix subscription: whether you watch 0 shows or 100 shows this month, you still pay the same £15.99. It doesn't matter if you're binge-watching every night or on vacation—the bill stays the same. Similarly, a business pays the same rent whether it's busy or quiet, whether it's December (peak season) or February (slow season). These costs are 'fixed' to time, not activity.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Tesla Factory (Fremont, California):</strong><div class='example'>Tesla's Fremont factory has massive fixed costs:<br><br><strong>Annual Costs (regardless of production):</strong><br>• Facility maintenance and property taxes: ~$50 million/year<br>• Core engineering and management salaries: ~$200 million/year<br>• Equipment depreciation: ~$300 million/year<br><br><strong>The Fixed Cost Challenge:</strong> During 2019 production problems, Tesla struggled to ramp up Model 3 production. They still had to pay all these fixed costs even when producing fewer cars than planned. CEO Elon Musk called it 'production hell.'<br><br><strong>The Solution:</strong> Once production scaled to 500,000+ cars annually, these fixed costs were spread across many more units, dramatically reducing cost per vehicle and leading to profitability. This demonstrates why high-volume production is crucial for businesses with high fixed costs.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A restaurant has monthly expenses: Rent £5,000, Manager's salary £3,500, Insurance £500, Chef's hourly wages £4,000, Food ingredients £6,000. If the restaurant temporarily closes for a month for renovations, which costs must still be paid?</div>
+```
+
+<div class="options"><div class="option">A) Only rent (£5,000)</div><div class="option">B) Rent, manager's salary, and insurance (£9,000)</div><div class="option">C) All costs except food ingredients (£13,000)</div><div class="option">D) All costs must be paid (£19,000)</div></div>
+            <button class="show-btn" onclick="toggleAnswer(7)">Show Answer</button>
+            <div class="answer" id="answer7">
+                <div class="answer-label">✓ Correct Answer: B (£9,000)</div>
+                <div class="box-content"><strong>Fixed Costs (must pay):</strong><br>• Rent: £5,000 (lease obligation continues)<br>• Manager's salary: £3,500 (typically a salaried position)<br>• Insurance: £500 (policy remains active)<br><strong>Total: £9,000</strong><br><br><strong>Variable Costs (don't pay):</strong><br>• Chef's hourly wages: £0 (no hours worked, no pay)<br>• Food ingredients: £0 (no customers, no food purchased)<br><br>This illustrates the financial burden of fixed costs—the restaurant loses £9,000 during closure with zero revenue. This is why many restaurants struggled during COVID-19 lockdowns; they still faced fixed costs despite being unable to operate.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="8">
+    <h1>Variable Costs</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content"><strong>Variable costs</strong> are expenses that change in direct proportion to the level of production or sales. As output increases, variable costs increase proportionally; as output decreases, variable costs decrease.<br><br><strong>Common examples:</strong> Raw materials (ingredients, components, supplies), Direct labor (hourly wages for production workers), Packaging (boxes, labels, wrapping), Energy for production (electricity and fuel to run machinery), Shipping costs (delivery expenses per unit sold), Sales commissions (payments based on sales volume).<br><br><strong>Key principle:</strong> If you double production, variable costs double. If you produce nothing, variable costs are zero.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Variable costs are like your mobile phone data charges—the more you use, the more you pay (if you don't have unlimited data). If you stream 10 hours of video, you pay more than if you stream 1 hour. If you don't use your phone at all, your data usage cost is zero. Similarly, if a smoothie company makes 1,000 smoothies, they need 1,000 bananas. If they make 2,000 smoothies, they need 2,000 bananas. The cost varies directly with production volume.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Innocent Smoothies (UK):</strong><div class='example'>Innocent Drinks demonstrates clear variable costs in beverage production:<br><br><strong>Making one Strawberry Smoothie (250ml):</strong><br>• Strawberries: £0.35<br>• Bananas: £0.15<br>• Other fruit: £0.10<br>• Bottle and label: £0.08<br>• Energy for production: £0.02<br><strong>Total variable cost per unit: £0.70</strong><br><br><strong>Production scenarios:</strong><br>• Produce 10,000 smoothies: Variable costs = 10,000 × £0.70 = £7,000<br>• Produce 20,000 smoothies: Variable costs = 20,000 × £0.70 = £14,000<br><br>Notice how costs double when production doubles—that's the defining characteristic of variable costs. If Innocent didn't produce any smoothies on a particular day, these variable costs would be £0, but their fixed costs (factory rent, management salaries, insurance) would still need to be paid.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A t-shirt printing company has costs per shirt: blank t-shirt £4.00, ink and printing £1.50, packaging £0.50, hourly labor £0.80 per shirt. If they receive an order for 500 t-shirts, what are the total variable costs?</div>
+
+        <button class="show-btn" onclick="toggleAnswer(8)">Show Answer</button>
+        <div class="answer" id="answer8">
+            <div class="answer-label">✓ Correct Answer: £3,400</div>
+            <div class="box-content"><div class='calc-step'><strong>Step 1:</strong> Calculate variable cost per unit<br>Variable cost per shirt = £4.00 + £1.50 + £0.50 + £0.80<br>Variable cost per shirt = £6.80</div><div class='calc-step'><strong>Step 2:</strong> Calculate total variable costs<br>Total variable costs = £6.80 × 500<br>Total variable costs = <span class='highlight'>£3,400</span></div><strong>Key Insight:</strong> Variable costs scale linearly. If the order was for 1,000 shirts instead of 500, the variable costs would simply double to £6,800. This predictability helps businesses accurately quote prices for different order sizes.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="9">
+    <h1>Break-Even Analysis: Jason's Burger Van</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content"><strong>Break-even analysis</strong> identifies the minimum sales level needed to cover all costs—the point where total revenue equals total costs, resulting in neither profit nor loss.<br><br><strong>Jason's Burger Van:</strong> Fixed Costs: Equipment hire £100 + Advertising £50 + Insurance £15 = <strong>£165 total</strong>. Variable Costs: £1.00 per burger. Selling Price: £2.00 per burger.<br><br><table><tr><th>Burgers</th><th>Fixed Costs</th><th>Variable Costs</th><th>Total Costs</th><th>Revenue</th><th>Profit/(Loss)</th></tr><tr><td>0</td><td>£165</td><td>£0</td><td>£165</td><td>£0</td><td>(£165)</td></tr><tr><td>100</td><td>£165</td><td>£100</td><td>£265</td><td>£200</td><td>(£65)</td></tr><tr><td>165</td><td>£165</td><td>£165</td><td>£330</td><td>£330</td><td><strong>£0</strong></td></tr><tr><td>200</td><td>£165</td><td>£200</td><td>£365</td><td>£400</td><td>£35</td></tr><tr><td>300</td><td>£165</td><td>£300</td><td>£465</td><td>£600</td><td>£135</td></tr></table></div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Imagine you need to pay £165 in bills before you can start keeping any money for yourself. Every burger you sell brings in £2, but costs you £1 to make, so you keep £1 from each burger. Question: How many burgers do you need to sell to cover that £165 in bills? Answer: 165 burgers. After that, every burger you sell puts pure profit in your pocket!</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Street Food Vendor - Authentic Tacos (London):</strong><div class='example'>Maria runs a taco stall at Camden Market. Her situation mirrors Jason's burger van:<br><br><strong>Fixed costs (daily):</strong> Market stall rental £80 + Equipment and permits £40 + Helper's daily wage £60 = <strong>£180 total</strong><br><br><strong>Variable costs per taco: £1.80</strong> (ingredients, packaging)<br><strong>Selling price per taco: £6.00</strong><br><strong>Contribution per taco: £6.00 - £1.80 = £4.20</strong><br><br><strong>Break-even:</strong> £180 ÷ £4.20 = 43 tacos/day<br><br><strong>Real impact:</strong> Maria must sell at least 43 tacos daily just to cover costs. On a typical Saturday, she sells 120 tacos, earning (120 - 43) × £4.20 = £323 profit. But on a rainy Tuesday, if she only sells 30 tacos, she loses money despite being busy all day.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: Looking at Jason's table, if Jason sells 150 burgers, what is his profit or loss?</div>
+```
+
+<div class="options"><div class="option">A) £15 profit</div><div class="option">B) £0 (break-even)</div><div class="option">C) £15 loss</div><div class="option">D) £150 profit</div></div>
+            <button class="show-btn" onclick="toggleAnswer(9)">Show Answer</button>
+            <div class="answer" id="answer9">
+                <div class="answer-label">✓ Correct Answer: C (£15 loss)</div>
+                <div class="box-content"><div class='calc-step'>Fixed costs: £165<br>Variable costs (150 burgers): 150 × £1.00 = £150<br><strong>Total costs: £315</strong></div><div class='calc-step'>Revenue (150 burgers): 150 × £2.00 = £300</div><div class='calc-step'>Profit = Revenue - Total Costs<br>Profit = £300 - £315 = <span class='highlight'>-£15 (loss)</span></div><strong>Key Insight:</strong> Even though Jason sold 150 burgers and made £1 from each burger (£2 revenue - £1 cost), he's still £15 short of covering his £165 in fixed costs. He needs to sell 165 burgers to break even. This demonstrates why the break-even point is so important—selling below this point always results in a loss.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="10">
+    <h1>Break-Even Formula</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">The break-even formula calculates the exact number of units that must be sold to cover all business costs. At the break-even point, total revenue equals total costs, resulting in zero profit and zero loss.<div class='formula'>Break-even Output = Fixed Costs ÷ (Selling Price per Unit - Variable Cost per Unit)</div><br><strong>Key terms:</strong> <strong>Fixed Costs:</strong> Total costs that don't change with output. <strong>Selling Price per Unit:</strong> What you charge customers per item. <strong>Variable Cost per Unit:</strong> What it costs to make one item. <strong>Contribution per Unit:</strong> (Selling Price - Variable Cost) - the amount each unit contributes toward covering fixed costs and generating profit.<br><br><strong>Why this works:</strong> Each unit sold contributes a certain amount toward covering fixed costs. The formula simply divides total fixed costs by the contribution per unit to determine how many units are needed.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Think of it this way: You owe your friend £100. Every time you do a chore, you earn £5 to pay them back. How many chores do you need to do? £100 ÷ £5 = 20 chores. The break-even formula works the same way: Fixed costs (the 'debt' you need to pay) ÷ Contribution per unit (what you keep from each sale) = Number of units to sell. After that, you're in profit!</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Igloo Ice Cream Shop:</strong><div class='example'><strong>Business details:</strong><br>• Variable cost per ice cream: £0.50<br>• Selling price per ice cream: £2.50<br>• Fixed costs per week: £2,000 (rent, utilities, salaries, equipment)<br><br><div class='calc-step'>Contribution per unit = £2.50 - £0.50 = £2.00</div><div class='calc-step'>Break-even output = £2,000 ÷ £2.00 = <strong>1,000 ice creams per week</strong></div><br><strong>Important insight:</strong> Although each ice cream seems to make a £2 'profit,' the first 999 ice creams actually just reduce the business's losses. Only the 1,000th ice cream truly breaks even. The 1,001st ice cream is the first one that generates actual profit.<br><br><strong>Weekly scenarios:</strong><br>• Sell 800: Loss of £400 (200 units short × £2)<br>• Sell 1,000: Break-even (£0 profit)<br>• Sell 1,500: Profit of £1,000 (500 units over × £2)</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A candle-making business has fixed costs of £800 per month. Each candle costs £3 to make and sells for £12. Calculate the break-even point in units.</div>
+
+        <button class="show-btn" onclick="toggleAnswer(10)">Show Answer</button>
+        <div class="answer" id="answer10">
+            <div class="answer-label">✓ Correct Answer: 89 candles (rounded up)</div>
+            <div class="box-content"><div class='calc-step'><strong>Step 1:</strong> Calculate contribution per unit<br>Contribution = £12 - £3 = £9 per candle</div><div class='calc-step'><strong>Step 2:</strong> Apply break-even formula<br>Break-even = £800 ÷ £9 = 88.89 candles</div><div class='calc-step'><strong>Step 3:</strong> Round up to whole units<br>You can't sell 0.89 of a candle, so round up to <span class='highlight'>89 candles</span></div><strong>Interpretation:</strong> The business must sell at least 89 candles monthly to cover all costs. At 88 candles, they'd have a small loss of £1. The 89th candle pushes them over the break-even threshold. Every candle beyond 89 contributes £9 directly to profit.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="11">
+    <h1>Break-Even Analysis Purpose</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content"><strong>Break-even analysis</strong> is a financial planning tool that compares revenues with costs to identify minimum sales needed to cover all costs. The break-even point is where Total Revenue = Total Costs (zero profit/loss).<br><br><strong>Why businesses conduct break-even analysis:</strong><br><strong>1. Pricing Decisions:</strong> Helps determine if current pricing will allow profitability.<br><strong>2. Viability Testing:</strong> Before launching, reveals whether the venture is financially feasible.<br><strong>3. Risk Assessment:</strong> Shows vulnerability to sales fluctuations—low break-even means lower risk.<br><strong>4. Target Setting:</strong> Provides sales teams with minimum performance targets.<br><strong>5. Profit Planning:</strong> Once break-even is known, businesses can calculate profit at different sales levels.<br><strong>6. Decision Making:</strong> Informs decisions about expansion, cost-cutting, price changes, or discontinuing products.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Break-even analysis answers the critical question: 'How much do I need to sell before I stop losing money?' It's like knowing you need to run a lemonade stand for at least 3 hours to cover the cost of supplies and table rental. Before 3 hours, you're in the red. After 3 hours, you're making profit. This knowledge helps you decide if it's worth doing at all, and helps you set realistic goals.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Netflix's Streaming Business Model (2007):</strong><div class='example'>When Netflix transitioned from DVD rentals to streaming, they faced a massive break-even challenge:<br><br><strong>Fixed Costs (annual):</strong> Content licensing ~$1 billion + Technology infrastructure ~$200 million + Marketing and overhead ~$300 million = <strong>~$1.5 billion total</strong><br><br><strong>Variable costs:</strong> Minimal (streaming bandwidth ~$1 per subscriber/year)<br><strong>Subscription price:</strong> $8.99/month = $107.88/year<br><strong>Contribution per subscriber:</strong> ~$107 per year<br><br><strong>Break-even:</strong> $1.5 billion ÷ $107 ≈ 14 million subscribers needed<br><br><strong>The decision:</strong> Netflix's analysis showed they needed critical mass quickly. This informed their aggressive marketing spend and international expansion strategy. By 2013, they had 30 million subscribers, well past break-even and generating substantial profits. Today, with over 260 million subscribers, the same fixed costs are spread across far more people, creating massive profitability.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: Why is break-even analysis particularly important for businesses with high fixed costs (like airlines or hotels)?</div>
+
+        <button class="show-btn" onclick="toggleAnswer(11)">Show Answer</button>
+        <div class="answer" id="answer11">
+            <div class="answer-label">✓ Answer: High Financial Risk and Operating Leverage</div>
+            <div class="box-content"><strong>Key Reasons:</strong><br><br><strong>1. Operating Leverage:</strong> Businesses with high fixed costs have high 'operating leverage'—small changes in sales volume create large changes in profitability. An airline must pay for aircraft, fuel, crew, and gates regardless of how many seats are filled. Each additional passenger adds mostly pure profit once costs are covered.<br><br><strong>2. Survival Threshold:</strong> High fixed costs mean these businesses need substantial sales volume just to survive. A hotel with 200 rooms, mortgage payments, staff, and utilities must maintain high occupancy rates. Fall below break-even for too long, and the business becomes unsustainable.<br><br><strong>3. Pricing Strategy:</strong> Understanding break-even helps explain 'last-minute deals.' An airline seat or hotel room has zero value if unsold. Once fixed costs are covered, selling a £500 hotel room for £100 at the last minute still contributes £100 toward profit (assuming minimal variable costs).<br><br><strong>Example:</strong> During COVID-19, airlines faced catastrophic losses because passenger numbers fell below break-even while fixed costs (aircraft leases, mandatory maintenance) continued. Many airlines needed government bailouts.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="12">
+    <h1>Break-Even Chart Components</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">A <strong>break-even chart</strong> is a visual representation showing the relationship between costs, revenue, and output. It displays the break-even point graphically.<br><br><strong>Information needed:</strong><br><strong>1. Fixed Costs:</strong> Total costs that remain constant (appears as horizontal line)<br><strong>2. Variable Costs per Unit:</strong> Costs that change with production volume<br><strong>3. Selling Price per Unit:</strong> Price charged to customers (determines revenue line slope)<br><strong>4. Expected Output/Sales Volume:</strong> Range of production levels to analyze<br><br><strong>Chart components:</strong> <strong>X-axis:</strong> Output/units sold | <strong>Y-axis:</strong> Costs and revenue (£) | <strong>Fixed Cost Line:</strong> Horizontal line | <strong>Total Cost Line:</strong> Starts at fixed costs, slopes upward | <strong>Revenue Line:</strong> Starts at origin (0,0), slopes upward | <strong>Break-Even Point:</strong> Where total cost and revenue lines intersect | <strong>Profit/Loss Areas:</strong> Loss area below break-even, profit area above</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">A break-even chart is like a financial map that shows your journey from loss to profit. Imagine climbing a hill: you start in the valley (loss), climb upward (reducing loss with each sale), reach the summit (break-even point where you're neither winning nor losing), and then descend into sunny meadows (profit zone). The chart shows exactly where that summit is and how profitable you become as you go further.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Concert Venue Economics - O2 Arena (London):</strong><div class='example'><strong>Fixed Costs per Concert:</strong> Venue rental £50,000 + Sound/lighting crew £30,000 + Security/staff £20,000 + Artist guarantee £100,000 = <strong>£200,000 total</strong><br><br><strong>Variable Costs:</strong> £5 per ticket (ticketing fees, additional staff)<br><strong>Average Ticket Price:</strong> £55<br><strong>Contribution per ticket:</strong> £55 - £5 = £50<br><strong>Venue Capacity:</strong> 20,000 seats<br><br><strong>Break-even:</strong> £200,000 ÷ £50 = 4,000 tickets (20% capacity)<br><br><strong>On a break-even chart:</strong><br>• At 0 tickets: £200,000 loss (fixed costs)<br>• At 4,000 tickets: £0 profit (break-even point)<br>• At 10,000 tickets: £300,000 profit<br>• At 20,000 tickets (sell-out): £800,000 profit<br><br><strong>Why this matters:</strong> The promoter knows they need to sell at least 4,000 tickets to avoid losing money. This drives marketing decisions, pricing strategies, and risk assessment. The steep profit increase after break-even explains why promoters heavily market to push sales beyond break-even.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: On a break-even chart, what does it mean when the revenue line is below the total cost line?</div>
+```
+
+<div class="options"><div class="option">A) The business is making a profit</div><div class="option">B) The business has reached break-even</div><div class="option">C) The business is making a loss</div><div class="option">D) Fixed costs are too high</div></div>
+            <button class="show-btn" onclick="toggleAnswer(12)">Show Answer</button>
+            <div class="answer" id="answer12">
+                <div class="answer-label">✓ Correct Answer: C</div>
+                <div class="box-content"><strong>Explanation:</strong> When the revenue line is below the total cost line, it means revenue is less than costs, indicating the business is operating at a loss.<br><br><strong>Visual interpretation:</strong><br>• <strong>Revenue line below total costs:</strong> Loss zone (costs exceed revenue)<br>• <strong>Revenue line intersects total costs:</strong> Break-even point (costs equal revenue)<br>• <strong>Revenue line above total costs:</strong> Profit zone (revenue exceeds costs)<br><br>The vertical distance between the two lines represents the magnitude of loss (when revenue is lower) or profit (when revenue is higher). For example, if at 100 units, total costs are £5,000 but revenue is only £4,000, the business has a £1,000 loss—visually shown as the gap between the lines.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="13">
+    <h1>Applications of Break-Even Analysis</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Break-even analysis is a powerful decision-making tool for evaluating strategic options:<br><br><strong>1. Pricing Decisions:</strong> Shows how price changes affect break-even point. Increasing prices lowers break-even volume but might reduce demand.<br><strong>2. Cost Reduction Analysis:</strong> Demonstrates how cutting costs reduces break-even point, improving profitability and reducing risk.<br><strong>3. Investment Evaluation:</strong> When considering new equipment or expansion, reveals whether increased fixed costs can be justified.<br><strong>4. Product Launch Decisions:</strong> Helps determine if a new product is viable by showing required sales volume.<br><strong>5. Margin of Safety:</strong> Calculates how far actual/expected sales are above break-even. Formula: (Current Sales - Break-even Sales) ÷ Current Sales × 100%.<br><strong>6. Target Profit Planning:</strong> Can be modified to calculate sales for specific profit targets: (Fixed Costs + Target Profit) ÷ Contribution per Unit.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Break-even analysis is like a financial 'what if' calculator. What if we raise prices? What if we cut costs? What if we expand? It answers these questions with numbers, not guesses. It's the difference between saying 'I think we should be fine' and 'We need to sell 1,000 units to cover costs, and we're currently at 1,500, so we have a 33% safety margin.' Data beats guesswork every time.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Restaurant Chain Expansion - Wagamama (2015):</strong><div class='example'>Wagamama used break-even analysis when deciding whether to expand into smaller towns:<br><br><strong>Existing London Location:</strong><br>• Fixed costs: £45,000/month<br>• Average meal price: £15, Variable cost: £5<br>• Contribution: £10 per meal<br>• Break-even: 4,500 meals/month (150 meals/day)<br>• Actual sales: 7,500 meals/month<br>• Margin of safety: (7,500 - 4,500) ÷ 7,500 = 40%<br><br><strong>Proposed Smaller Town Location:</strong><br>• Lower fixed costs: £28,000/month (cheaper rent)<br>• Same meal economics: £10 contribution<br>• Break-even: 2,800 meals/month (93 meals/day)<br>• Projected sales: 3,500 meals/month<br>• Margin of safety: (3,500 - 2,800) ÷ 3,500 = 20%<br><br><strong>The Decision:</strong> While London had a healthier 40% safety margin, the analysis showed the smaller town was viable with a 20% margin. The lower break-even point reduced risk. Wagamama proceeded with expansion.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A software company has a break-even point of 500 subscriptions per month. They currently have 800 subscriptions. What is their margin of safety as a percentage?</div>
+
+        <button class="show-btn" onclick="toggleAnswer(13)">Show Answer</button>
+        <div class="answer" id="answer13">
+            <div class="answer-label">✓ Correct Answer: 37.5%</div>
+            <div class="box-content"><div class='calc-step'><strong>Margin of Safety Formula:</strong><br>[(Current Sales - Break-even Sales) ÷ Current Sales] × 100%</div><div class='calc-step'><strong>Step 1:</strong> Calculate difference<br>800 - 500 = 300 subscriptions</div><div class='calc-step'><strong>Step 2:</strong> Divide by current sales<br>300 ÷ 800 = 0.375</div><div class='calc-step'><strong>Step 3:</strong> Convert to percentage<br>0.375 × 100% = <span class='highlight'>37.5%</span></div><strong>Interpretation:</strong> The company can lose 37.5% of its subscriptions (300 subscribers) before reaching break-even and starting to lose money. This is a healthy safety margin. Generally: Below 20% = Risky | 20-40% = Moderate | Above 40% = Strong position.</div>
+        </div>
+    </div>
+</div>
+
+<div class="slide" data-slide="14">
+    <h1>Limitations of Break-Even Analysis</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">While valuable, break-even analysis has important limitations:<br><br><strong>1. Assumes Constant Costs:</strong> Assumes fixed costs remain constant and variable costs per unit stay the same. In reality, bulk discounts, overtime payments, or efficiency gains can change these.<br><strong>2. Assumes Constant Prices:</strong> Assumes selling price remains constant. In practice, businesses may need to discount prices to sell higher volumes.<br><strong>3. Single Product Focus:</strong> Standard break-even works best for single products. Multi-product businesses must use weighted averages, which is more complex and less precise.<br><strong>4. Static Model:</strong> A snapshot in time. Market conditions, competition, costs, and customer preferences constantly change.<br><strong>5. Ignores Inventory:</strong> Assumes all production is sold immediately. In reality, inventory buildup affects cash flow.<br><strong>6. Short-Term Focus:</strong> Best for short-term planning. Doesn't account for long-term strategic factors like brand building or competitive response.<br><strong>7. Difficult Cost Categorization:</strong> Not all costs fit neatly into 'fixed' or 'variable.' Semi-variable costs have both components.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Break-even analysis is like using a weather app. It gives you useful information based on current conditions and assumptions, but it's not perfect. The app assumes weather patterns will follow historical trends, doesn't account for unexpected events (like a freak storm), and becomes less accurate the further ahead you look. Similarly, break-even analysis provides valuable guidance but shouldn't be your only decision-making tool. It's a starting point, not the complete picture.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Tesla Model 3 Production (2017-2018):</strong><div class='example'>Tesla's Model 3 launch demonstrates how real-world complexity can challenge break-even assumptions:<br><br><strong>Initial Break-Even Analysis (2017):</strong><br>Tesla calculated they needed 5,000 Model 3s per week to break even, based on fixed costs (factory, equipment, overhead), variable costs (materials, labor), and average selling price of $50,000.<br><br><strong>Reality Challenged Every Assumption:</strong><br><br><strong>1. Variable costs weren't constant:</strong> Early production was heavily manual with high labor costs. As they automated and gained experience, per-unit costs dropped dramatically.<br><br><strong>2. Fixed costs increased:</strong> Production bottlenecks required additional equipment and factory space, raising fixed costs beyond initial estimates.<br><br><strong>3. Price pressure:</strong> To boost volume, Tesla introduced a $35,000 base model, lowering average selling price significantly.<br><br><strong>4. Production complexity:</strong> Manufacturing ramp-up was much harder than assumed. It took months longer to reach target production rates.<br><br><strong>The Outcome:</strong> Tesla's actual break-even point kept shifting. What the initial analysis predicted as profitable at 5,000 units/week took until late 2018 to actually achieve due to these complications. The company hemorrhaged cash during 'production hell.'<br><br><strong>Lesson:</strong> Break-even analysis gave Tesla a target, but reality required constant adjustment.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: A retailer sells high-end jackets (£200 each, £80 variable cost) and budget t-shirts (£15 each, £5 variable cost). Why is break-even analysis more complex than for a single-product business?</div>
+```
+
+<div class="options"><div class="option">A) Fixed costs are different for each product</div><div class="option">B) Contribution per unit differs, requiring weighted average calculations</div><div class="option">C) Variable costs change with volume for multi-product businesses</div><div class="option">D) Multi-product businesses have higher fixed costs</div></div>
+            <button class="show-btn" onclick="toggleAnswer(14)">Show Answer</button>
+            <div class="answer" id="answer14">
+                <div class="answer-label">✓ Correct Answer: B</div>
+                <div class="box-content"><strong>Explanation:</strong> The complexity arises from different contribution margins:<br><br><strong>Jacket contribution:</strong> £200 - £80 = £120 per unit<br><strong>T-shirt contribution:</strong> £15 - £5 = £10 per unit<br><br><strong>The Problem:</strong> One jacket contributes as much as 12 t-shirts toward covering fixed costs! The break-even point completely changes depending on the product mix:<br><br><strong>If fixed costs are £12,000:</strong><br>• Selling only jackets: 100 jackets needed<br>• Selling only t-shirts: 1,200 t-shirts needed<br>• Mixed sales: Requires weighted average calculation<br><br>If the retailer expects to sell 3 t-shirts for every 1 jacket, they need to calculate a weighted average contribution margin. If the actual sales mix differs from projections, the break-even point will be wrong.</div>
+            </div>
+        </div>
+    </div>
+
+```
+<div class="slide" data-slide="15">
+    <h1>Financial Analysis in Practice</h1>
+    
+    <div class="box">
+        <div class="box-title">📊 Concept</div>
+        <div class="box-content">Successful businesses integrate all financial analysis tools to make informed decisions:<br><br><strong>The Financial Planning Process:</strong><br>1. <strong>Set Financial Objectives:</strong> Define specific, measurable goals (profit targets, ROI, cash flow requirements)<br>2. <strong>Understand Cost Structure:</strong> Accurately identify and categorize fixed and variable costs<br>3. <strong>Calculate Revenue Requirements:</strong> Determine pricing strategy and sales volume needed<br>4. <strong>Perform Break-Even Analysis:</strong> Identify minimum sales volume for viability<br>5. <strong>Assess Margin of Safety:</strong> Evaluate risk by comparing projected sales to break-even<br>6. <strong>Monitor and Adjust:</strong> Track actual performance against objectives and adapt strategy<br><br><strong>Critical Success Factors:</strong> Accurate cost tracking, realistic sales forecasting, regular review of assumptions, understanding tool limitations, combining quantitative analysis with qualitative judgment, maintaining flexibility to adapt.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">💡 Plain English</div>
+        <div class="box-content">Financial analysis isn't just about calculating numbers—it's about understanding your business's financial story. Where does money come from? Where does it go? What needs to happen for you to succeed? It's like having a GPS for your business journey: you need to know where you're starting (current finances), where you want to go (financial objectives), and the best route to get there (strategy based on cost and revenue analysis). Break-even analysis tells you the minimum distance you must travel; margin of safety shows how much cushion you have for detours.</div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">🌍 Real-World Example</div>
+        <div class="box-content"><strong>Airbnb's Financial Turnaround (2020-2021):</strong><div class='example'>Airbnb's response to COVID-19 demonstrates integrated financial analysis in action:<br><br><strong>The Crisis (March 2020):</strong><br>• Bookings dropped 70% overnight<br>• Revenue collapsed while fixed costs continued<br>• Break-even became impossible<br>• Company was losing $1 billion+ with pre-crisis cost structure<br><br><strong>Integrated Financial Response:</strong><br><br><strong>1. Cost Restructuring:</strong><br>• Cut fixed costs by $800 million (marketing, projects, travel)<br>• Reduced workforce by 25% (1,900 employees)<br>• This lowered the break-even point significantly<br><br><strong>2. Revenue Adaptation:</strong><br>• Shifted focus to local/domestic travel (faster recovery)<br>• Introduced 'flexible cancellation' to increase bookings<br>• Added 'long-term stays' and 'work-from-anywhere' options<br><br><strong>3. New Financial Objective:</strong><br>• Priority shifted from growth to profitability and cash flow<br>• Target: Achieve profitability within 6 months<br><br><strong>The Results:</strong><br>• Q4 2020: Returned to profitability<br>• 2021: Revenue of $6 billion, net income of $352 million<br>• December 2020 IPO valued company at $47 billion<br><br><strong>Key Lesson:</strong> Airbnb used financial analysis holistically—cutting fixed costs to lower break-even, adapting revenue strategies to market changes, and setting clear objectives. This integrated approach enabled survival and rapid recovery.</div></div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-text">❓ Question: You're opening a café. Fixed costs are £4,000/month. Each coffee costs £0.80 to make and sells for £3.20. Each sandwich costs £2.00 to make and sells for £6.00. You expect to sell 3 coffees for every 1 sandwich. (a) Calculate weighted average contribution. (b) Calculate monthly break-even in total units. (c) How many coffees and sandwiches?</div>
+
+        <button class="show-btn" onclick="toggleAnswer(15)">Show Answer</button>
+        <div class="answer" id="answer15">
+            <div class="answer-label">✓ Complete Solution</div>
+            <div class="box-content"><strong>(a) Weighted Average Contribution:</strong><div class='calc-step'><strong>Coffee contribution:</strong> £3.20 - £0.80 = £2.40<br><strong>Sandwich contribution:</strong> £6.00 - £2.00 = £4.00<br><strong>Sales mix:</strong> 3 coffees : 1 sandwich (75% coffee, 25% sandwich)<br><strong>Weighted contribution:</strong> (£2.40 × 0.75) + (£4.00 × 0.25) = £1.80 + £1.00 = <span class='highlight'>£2.80</span></div><br><strong>(b) Break-Even in Total Units:</strong><div class='calc-step'>Break-even = £4,000 ÷ £2.80 = <span class='highlight'>1,429 total units/month</span> (rounded up)</div><br><strong>(c) Breakdown by Product:</strong><div class='calc-step'><strong>Coffees (75%):</strong> 1,429 × 0.75 = <span class='highlight'>1,072 coffees/month</span> (≈36/day)<br><strong>Sandwiches (25%):</strong> 1,429 × 0.25 = <span class='highlight'>357 sandwiches/month</span> (≈12/day)</div><br><strong>Interpretation:</strong> The café must sell approximately 36 coffees and 12 sandwiches daily to break even. This mixed-product analysis is more complex but essential for realistic planning. If actual sales mix differs (e.g., more sandwiches, fewer coffees), profitability will vary from projections.</div>
+        </div>
+    </div>
+</div>
+
+<div class="nav">
+    <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+    <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+</div>
+
+<script>
+    let currentSlide = 1;
+    const totalSlides = 15;
+
+    function showSlide(n) {
+        const slides = document.querySelectorAll('.slide');
+        if (n > totalSlides) currentSlide = totalSlides;
+        if (n < 1) currentSlide = 1;
+        
+        slides.forEach(slide => slide.classList.remove('active'));
+        slides[currentSlide - 1].classList.add('active');
+        
+        document.getElementById('current').textContent = currentSlide;
+        document.getElementById('prevBtn').disabled = (currentSlide === 1);
+        document.getElementById('nextBtn').disabled = (currentSlide === totalSlides);
+        
+        window.scrollTo(0, 0);
+    }
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+        showSlide(currentSlide);
+    }
+
+    function toggleAnswer(slideNum) {
+        const answer = document.getElementById('answer' + slideNum);
+        answer.classList.toggle('visible');
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        showSlide(1);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') changeSlide(-1);
+        if (e.key === 'ArrowRight') changeSlide(1);
+    });
+</script>
+```
+
+</body>
+</html>
